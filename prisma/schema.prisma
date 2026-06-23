@@ -1,0 +1,45 @@
+// Prisma schema for the portfolio / idea-voting platform.
+// Uses SQLite so the project is fully self-contained and easy to run locally.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  summary     String
+  description String
+  // "hardware" | "software"
+  category    String
+  // "idea" | "mockup" | "prototype" | "in_progress" | "completed"
+  stage       String   @default("idea")
+  imageUrl    String?
+  demoUrl     String?
+  // Comma-separated list of tags (SQLite has no native array type).
+  tags        String   @default("")
+  featured    Boolean  @default(false)
+  voteCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  votes Vote[]
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  projectId String
+  // Anonymous voter identity persisted in the browser (localStorage).
+  voterKey  String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, voterKey])
+  @@index([projectId])
+}
