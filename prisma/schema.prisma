@@ -1,5 +1,12 @@
-// Prisma schema for the portfolio / idea-voting platform.
-// Uses SQLite so the project is fully self-contained and easy to run locally.
+// Prisma schema for mitchelturner.dev
+//
+// Models:
+//   Project — manually curated showcase items (managed via /admin)
+//   Vote    — anonymous upvotes for showcase projects
+//   Setting — key/value config (e.g. GitHub username from admin dashboard)
+//
+// SQLite keeps local development self-contained. For production serverless,
+// prefer GITHUB_USERNAME env or github.config.json over DB-backed settings.
 
 generator client {
   provider = "prisma-client-js"

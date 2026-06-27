@@ -1,3 +1,9 @@
+/**
+ * GitHub repos API
+ *
+ * GET  /api/github/repos?limit=12&fresh=1 — fetch normalized portfolio repos
+ * POST /api/github/repos                     — admin-only force refresh
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { isAuthenticated } from "@/lib/auth";

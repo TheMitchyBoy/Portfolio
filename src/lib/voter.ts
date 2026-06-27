@@ -1,3 +1,9 @@
+/**
+ * Anonymous voter identity for the showcase voting feature.
+ *
+ * Generates a stable per-browser UUID in localStorage so each visitor gets
+ * one vote per project (enforced by a unique DB constraint on projectId + voterKey).
+ */
 "use client";
 
 import { useSyncExternalStore } from "react";

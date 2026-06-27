@@ -1,3 +1,10 @@
+/**
+ * Admin authentication — password-protected dashboard at /admin.
+ *
+ * Login verifies ADMIN_PASSWORD and sets an HTTP-only cookie containing an
+ * HMAC-SHA256 digest (never the raw password). All admin API routes call
+ * isAuthenticated() before mutating data.
+ */
 import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 

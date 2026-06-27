@@ -1,3 +1,14 @@
+/**
+ * GitHub API client for the Live Work portfolio.
+ *
+ * Fetches public repos for a configured username, normalizes them into
+ * `PortfolioRepo` objects, and enriches each with language breakdowns and
+ * optional deployment status. Responses are cached via Next.js fetch
+ * revalidation to stay within GitHub's rate limits (60 req/hr unauthenticated).
+ *
+ * @see resolveGithubUsername in ./settings.ts for username resolution
+ * @see /api/og/repo for per-repo cover graphics
+ */
 import { resolveGithubUsername } from "./settings";
 
 const API = "https://api.github.com";
