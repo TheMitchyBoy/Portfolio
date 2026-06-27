@@ -3,7 +3,10 @@ import type { Metadata } from "next";
 import { fetchPortfolioRepos } from "@/lib/github";
 import { RepoCard } from "@/components/RepoCard";
 
-export const revalidate = 3600;
+// Render per-request so a username configured at runtime (admin DB setting or
+// the GITHUB_USERNAME env var) is always reflected. The underlying GitHub API
+// calls are cached separately (see lib/github.ts) to respect rate limits.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Live work — Fathomline",

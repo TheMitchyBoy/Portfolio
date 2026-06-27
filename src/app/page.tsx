@@ -2,6 +2,10 @@ import Link from "next/link";
 import { ProjectGallery } from "@/components/ProjectGallery";
 import { GithubHighlights } from "@/components/GithubHighlights";
 
+// The GitHub highlights read the configured username from the DB, so render
+// per-request to reflect changes immediately (GitHub data stays cached).
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <>

@@ -151,7 +151,10 @@ export interface PortfolioResult {
 }
 
 // Fetch and normalize a user's public repositories for the portfolio.
-// `limit` bounds the more expensive per-repo calls (languages, deployments).
+// The configured username is resolved live (so admin/env changes apply
+// immediately), while the underlying GitHub API responses are cached for an
+// hour via the per-fetch `revalidate` option to respect rate limits. Because
+// the cache key includes the username, switching accounts always fetches fresh.
 export async function fetchPortfolioRepos(
   limit = 12,
 ): Promise<PortfolioResult> {

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { isAuthenticated } from "@/lib/auth";
 import {
   getSetting,
@@ -43,10 +42,8 @@ export async function POST(req: NextRequest) {
 
   await setSetting(GITHUB_USERNAME_KEY, username);
 
-  // The home and /github pages are statically cached; regenerate them so the
-  // newly linked account surfaces immediately instead of after the ISR window.
-  revalidatePath("/");
-  revalidatePath("/github");
-
+  // The /github and home pages render dynamically and resolve the username on
+  // each request, so the new account surfaces immediately — no cache busting
+  // needed (GitHub responses are keyed by username at the fetch layer).
   return NextResponse.json({ ok: true, username });
 }
