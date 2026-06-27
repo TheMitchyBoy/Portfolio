@@ -1,5 +1,4 @@
-// Shared brand mark: sonar pulse + data signal — reflects sensor data, ML, and
-// pipeline work. Used in the navbar; keep src/app/icon.svg in sync.
+// Brand mark — clean "M" monogram for mitchelturner.dev
 export function LogoMark({ className }: { className?: string }) {
   return (
     <svg
@@ -24,33 +23,10 @@ export function LogoMark({ className }: { className?: string }) {
         </linearGradient>
       </defs>
       <rect width="32" height="32" rx="8" fill="url(#mt-logo-bg)" />
-      {/* Sonar transducer */}
-      <circle cx="8.5" cy="16" r="2" fill="#04202a" />
-      {/* Sonar return arcs */}
       <path
-        d="M10.5 16a3.5 3.5 0 0 1 7 0"
+        d="M9 22V10l7 8 7-8v12"
         stroke="#04202a"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M10.5 16a6.5 6.5 0 0 1 13 0"
-        stroke="#04202a"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M10.5 16a9.5 9.5 0 0 1 19 0"
-        stroke="#04202a"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        opacity="0.45"
-      />
-      {/* Data / signal output */}
-      <path
-        d="M17.5 21.5 19.5 15l2 3.5 2-6 2.5 4.5 2-3"
-        stroke="#04202a"
-        strokeWidth="2"
+        strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
