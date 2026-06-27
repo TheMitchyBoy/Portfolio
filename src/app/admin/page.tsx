@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { AdminLogin } from "@/components/AdminLogin";
 import { ProjectForm } from "@/components/ProjectForm";
+import { GithubSettings } from "@/components/GithubSettings";
 import { STAGE_META, type ProjectDTO } from "@/lib/types";
 
 export default function AdminPage() {
@@ -72,6 +73,10 @@ export default function AdminPage() {
         >
           Log out
         </button>
+      </div>
+
+      <div className="mb-8">
+        <GithubSettings />
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">

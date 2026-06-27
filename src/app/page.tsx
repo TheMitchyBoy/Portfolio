@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ProjectGallery } from "@/components/ProjectGallery";
+import { GithubHighlights } from "@/components/GithubHighlights";
 
 export default function Home() {
   return (
@@ -64,6 +65,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <GithubHighlights />
 
       <ProjectGallery />
     </>
