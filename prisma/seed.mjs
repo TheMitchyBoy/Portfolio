@@ -1,3 +1,7 @@
+/**
+ * Seed script — populates sample showcase projects for local development.
+ * Run via: npm run db:seed  (or automatically after prisma migrate reset)
+ */
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();

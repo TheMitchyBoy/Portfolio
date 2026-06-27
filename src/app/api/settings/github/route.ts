@@ -1,3 +1,9 @@
+/**
+ * GitHub settings API
+ *
+ * GET  /api/settings/github — resolved username + active source
+ * POST /api/settings/github — set username (admin only, writes to SQLite)
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { isAuthenticated } from "@/lib/auth";

@@ -1,3 +1,10 @@
+/**
+ * Dynamic OG image generator for GitHub repo cards.
+ *
+ * GET /api/og/repo?name=&desc=&lang=&stars=&forks=&topics=
+ * Renders a 1200×630 PNG with gradient background, repo metadata, and stats.
+ * Used as cover art on RepoCard components.
+ */
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { languageColor } from "@/lib/github";

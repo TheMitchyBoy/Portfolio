@@ -1,3 +1,11 @@
+/**
+ * Application settings — key/value store in SQLite with env and file fallbacks.
+ *
+ * GitHub username resolution order (first match wins):
+ *   1. Admin dashboard (Prisma `Setting` table)
+ *   2. `GITHUB_USERNAME` environment variable
+ *   3. `github.config.json` in the project root (committed, serverless-safe)
+ */
 import { readFileSync } from "fs";
 import { join } from "path";
 import { prisma } from "./prisma";

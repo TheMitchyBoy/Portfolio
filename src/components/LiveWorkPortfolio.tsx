@@ -1,3 +1,9 @@
+/**
+ * Live Work portfolio — server component rendered on the homepage (/).
+ *
+ * Resolves the configured GitHub username, fetches normalized repos, and
+ * renders a grid of RepoCards. Pass fresh=true to bypass the fetch cache.
+ */
 import Link from "next/link";
 import { fetchPortfolioRepos } from "@/lib/github";
 import { resolveGithubUsernameWithSource } from "@/lib/settings";

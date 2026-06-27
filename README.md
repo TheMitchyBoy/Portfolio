@@ -1,116 +1,218 @@
 # mitchelturner.dev
 
-Personal portfolio site for **Mitchel Turner** — auto-synced GitHub work, an about page,
-and a hidden admin area for managing projects.
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS v4**, **Framer
-Motion** and **Prisma + SQLite**.
+Personal portfolio for **[Mitchel Turner](https://github.com/TheMitchyBoy)** — a Next.js site that auto-builds a project showcase from public GitHub repositories, with an about page and a password-protected admin area.
+
+**Live site:** [mitchelturner.dev](https://mitchelturner.dev)
+
+---
+
+## Overview
+
+This repo powers a developer portfolio that stays current without manual updates. Point it at a GitHub username and it:
+
+- Pulls public repositories and ranks them by activity and stars
+- Generates a unique **1200×630 cover graphic** per repo (via `next/og`)
+- Shows language breakdowns, topics, stars, and deployment links
+- Refreshes on a short cache interval (~2 minutes) with an optional force-refresh from admin
+
+The homepage **is** the portfolio. A separate `/about` page covers background and freelance availability. The admin dashboard (`/admin`) is unlisted and password-protected.
+
+---
 
 ## Features
 
-- **Showcase gallery** — animated, glassmorphic cards for every project with a cover
-  image, category (hardware / software), stage badge and tags.
-- **Clear status for every idea** — `Idea → Mockup → Prototype → In Progress →
-  Completed`, so mockups are never mistaken for shipped products.
-- **Community voting** — one tap to upvote (and tap again to remove). Votes are stored
-  in the database and attributed to an anonymous per-browser key, so the same person
-  can't stuff the ballot. Sort the showcase by **Top voted** or **Newest**.
-- **Search & filters** — filter by category and stage, or search across titles, summaries
-  and tags.
-- **Admin upload area** (`/admin`) — password-protected dashboard to publish new
-  projects, upload cover images (or paste an image URL), feature standouts, and delete
-  projects.
-- **Auto-synced GitHub portfolio** (`/github`) — point it at a GitHub username and the
-  "Live Work" page builds itself from your public repositories:
-  - **Generated cover art** — a unique 1200×630 graphic is rendered on the fly for every
-    repo (via `next/og`) using its name, description, primary language, topics and stats.
-  - **Deployment status** — surfaces live links from each repo's homepage, GitHub Pages,
-    or the GitHub Deployments API (with environment + status badges when a token is set).
-  - **Language breakdowns**, stars, forks and last-activity, all cached for an hour to
-    respect API rate limits.
-  - Set the username straight from the admin dashboard (stored in the DB) — no redeploy.
-- **Ultra-modern, deep-ocean design** — animated deep-ocean current background, latent-space
-  grid, ocean-depth gradient accents (blue → cyan → seafoam), frosted glass
-  surfaces, smooth motion, fully responsive.
+| Area | What it does |
+|------|----------------|
+| **Live Work** (`/`) | Full GitHub portfolio — repo cards with generated art, language bars, deployment badges |
+| **About** (`/about`) | Bio, work areas, stack, and contact CTA |
+| **OG graphics** (`/api/og/repo`) | On-the-fly cover images from repo metadata |
+| **Admin** (`/admin`) | Hidden dashboard — GitHub sync settings, project CRUD, image upload |
+| **Auth** | HMAC cookie session; password never stored client-side |
 
-## Quick start
+### GitHub integration
+
+- Username resolution: **admin DB** → `GITHUB_USERNAME` env → `github.config.json`
+- Deployment links from repo homepage, GitHub Pages, or Deployments API (with token)
+- Rate-limit aware: optional `GITHUB_TOKEN` raises limit from 60 → 5,000 req/hr
+
+---
+
+## Architecture
+
+```mermaid
+flowchart TB
+  subgraph public [Public pages]
+    Home["/  Live Work"]
+    About["/about"]
+  end
+
+  subgraph api [API routes]
+    GH["/api/github/repos"]
+    OG["/api/og/repo"]
+    Settings["/api/settings/github"]
+  end
+
+  subgraph data [Data layer]
+    Config["github.config.json"]
+    Env["GITHUB_USERNAME env"]
+    DB[(SQLite via Prisma)]
+    GHA["GitHub REST API"]
+  end
+
+  subgraph admin [Hidden admin]
+    Admin["/admin"]
+    Login["/api/admin/login"]
+  end
+
+  Home --> GH
+  GH --> Config
+  GH --> Env
+  GH --> DB
+  GH --> GHA
+  Home --> OG
+  Admin --> Settings
+  Admin --> Login
+  Settings --> DB
+```
+
+---
+
+## Tech stack
+
+| Layer | Choice |
+|-------|--------|
+| Framework | [Next.js 16](https://nextjs.org/) (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| Animation | Framer Motion |
+| Database | SQLite + [Prisma](https://www.prisma.io/) |
+| Graphics | `next/og` (dynamic PNG) |
+
+---
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 20+
+- npm 10+
+
+### Setup
 
 ```bash
-# 1. Install dependencies (also generates the Prisma client)
+# Clone and install
+git clone https://github.com/TheMitchyBoy/Portfolio.git
+cd Portfolio
 npm install
 
-# 2. Configure environment
+# Environment
 cp .env.example .env
-#   then edit ADMIN_PASSWORD in .env
+# Edit ADMIN_PASSWORD (required) and optionally GITHUB_USERNAME / GITHUB_TOKEN
 
-# 3. Create the database and apply migrations
+# Database
 npx prisma migrate dev
 
-# 4. (Optional) load sample projects
+# (Optional) sample showcase projects for admin area
 npm run db:seed
 
-# 5. Run the dev server
+# Dev server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The admin area lives at
-[http://localhost:3000/admin](http://localhost:3000/admin).
+Open [http://localhost:3000](http://localhost:3000). Admin: [http://localhost:3000/admin](http://localhost:3000/admin) (default password `changeme`).
 
-## Environment variables
+---
 
-| Variable          | Description                                                              | Default         |
-| ----------------- | ------------------------------------------------------------------------ | --------------- |
-| `DATABASE_URL`    | SQLite connection string (relative to `prisma/`).                        | `file:./dev.db` |
-| `ADMIN_PASSWORD`  | Password required to access the `/admin` upload area.                    | `changeme`      |
-| `GITHUB_USERNAME` | GitHub account for Live Work. Also configurable in `/admin` or `github.config.json`. | _(see config file)_ |
-| `GITHUB_TOKEN`    | Optional read-only token. Raises the API limit (60 → 5000 req/hr) and enables richer deployment status. | _(unset)_ |
+## Configuration
 
-> **Change `ADMIN_PASSWORD` before deploying.** The login sets an HTTP-only cookie
-> containing an HMAC of the password — the raw password is never stored client-side.
+### Environment variables
 
-> **GitHub username resolution** (first match wins): admin dashboard (SQLite) →
-> `GITHUB_USERNAME` env var → `github.config.json` in the repo root. On serverless
-> hosts (Vercel, etc.) the SQLite database is usually **not persistent**, so admin
-> saves may not stick — set `GITHUB_USERNAME` on your host or edit `github.config.json`
-> and redeploy. Repo data refreshes every ~2 minutes (or use **Force refresh** in admin).
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | SQLite path, e.g. `file:./dev.db` |
+| `ADMIN_PASSWORD` | Yes | Password for `/admin` (change before deploy) |
+| `GITHUB_USERNAME` | No | GitHub account for Live Work |
+| `GITHUB_TOKEN` | No | Read-only token for higher rate limits + deployment status |
+
+### `github.config.json`
+
+Committed fallback when env/DB are unavailable (ideal for serverless):
+
+```json
+{
+  "username": "your-github-handle"
+}
+```
+
+---
 
 ## Project structure
 
 ```
-prisma/
-  schema.prisma        # Project + Vote + Setting models (SQLite)
-  seed.mjs             # Sample hardware/software projects
-src/
-  app/
-    page.tsx           # Landing hero + GitHub highlights + showcase
-    github/page.tsx    # Auto-generated "Live Work" portfolio from GitHub
-    admin/page.tsx     # Admin dashboard (login, GitHub sync, upload, manage)
-    api/
-      projects/        # List / create / get / delete + vote
-      admin/           # login / logout / session
-      upload/          # image upload (admin only)
-      github/repos/    # Normalized portfolio repositories
-      og/repo/         # On-the-fly repo cover graphics (next/og)
-      settings/github/ # Get / set the configured GitHub username
-  components/          # Navbar, gallery, cards, modal, forms, RepoCard, GitHub settings
-  lib/                 # prisma client, auth, types, github client, settings, voter key
+├── github.config.json       # Fallback GitHub username (works on serverless)
+├── prisma/
+│   ├── schema.prisma        # Project, Vote, Setting models
+│   ├── seed.mjs             # Optional sample data
+│   └── migrations/
+├── public/
+│   ├── robots.txt           # Disallows /admin from crawlers
+│   └── uploads/             # Admin-uploaded images (gitignored)
+└── src/
+    ├── app/
+    │   ├── page.tsx         # Homepage → Live Work portfolio
+    │   ├── about/           # About page
+    │   ├── admin/           # Hidden admin dashboard
+    │   ├── github/          # Redirects to /
+    │   └── api/
+    │       ├── github/      # Repo sync + refresh
+    │       ├── og/repo/     # Dynamic cover graphics
+    │       ├── settings/    # GitHub username config
+    │       ├── projects/    # Showcase CRUD + voting (admin-managed)
+    │       └── admin/       # Login / session
+    ├── components/          # UI (LiveWorkPortfolio, RepoCard, LogoMark, …)
+    ├── lib/
+    │   ├── github.ts        # GitHub API client + normalization
+    │   ├── settings.ts      # Username resolution chain
+    │   ├── auth.ts          # Admin session (HMAC cookie)
+    │   └── prisma.ts        # DB client singleton
+    └── middleware.ts        # noindex headers for /admin
 ```
 
-## Useful scripts
+---
 
-| Script             | What it does                                    |
-| ------------------ | ----------------------------------------------- |
-| `npm run dev`      | Start the development server                    |
-| `npm run build`    | Generate the Prisma client and build for prod   |
-| `npm run start`    | Run the production build                        |
-| `npm run lint`     | Lint with ESLint                                |
-| `npm run db:seed`  | Seed sample projects                            |
-| `npm run db:reset` | Drop, re-migrate and re-seed the database       |
+## Scripts
 
-## Notes on deployment
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Prisma generate + production build |
+| `npm run start` | Run production build |
+| `npm run lint` | ESLint |
+| `npm run db:migrate` | Apply Prisma migrations |
+| `npm run db:seed` | Seed sample projects |
+| `npm run db:reset` | Reset DB and re-seed |
 
-This app uses a local SQLite database and stores uploaded images on the local
-filesystem (`public/uploads`). That works great for self-hosting / a long-running
-Node server (e.g. a VPS, Fly.io, Railway, Render). For ephemeral/serverless platforms
-where the filesystem isn't persistent, point `DATABASE_URL` at a hosted database and
-swap image uploads for an object store (S3, R2, etc.).
+---
+
+## Deployment
+
+**Self-hosted / VPS / Railway / Render** — SQLite + local `public/uploads` work out of the box.
+
+**Serverless (Vercel, etc.)** — SQLite and filesystem uploads are ephemeral. Recommended:
+
+1. Set `GITHUB_USERNAME` in host environment variables
+2. Or commit your username in `github.config.json`
+3. For admin persistence, use a hosted database (Turso, Postgres) and object storage for uploads
+
+Set `ADMIN_PASSWORD` to a strong secret in production.
+
+---
+
+## License
+
+[MIT](LICENSE) © Mitchel Turner
